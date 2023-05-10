@@ -5,7 +5,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"fmt"
-	tls "github.com/refraction-networking/utls"
+	"github.com/lidarx/tls"
 	"github.com/valyala/fasthttp"
 	"io"
 	"mime/multipart"
@@ -268,7 +268,7 @@ func (r *Request) Do(resp *Response) error {
 	u, err := url.Parse(string(r.Request.Header.RequestURI()))
 	if err == nil {
 		if r.Jar.Cookies(u) != nil {
-			r.Header.DelAllCookies()
+			//r.Header.DelAllCookies() // 此处不应该清除cookie
 			cookies := r.Jar.Cookies(u)
 			for _, c := range cookies {
 				r.Header.SetCookie(c.Name, c.Value)
