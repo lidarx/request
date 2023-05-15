@@ -165,10 +165,10 @@ func (r *Request) BodyRaw(s string) *Request {
 	r.Request.SetBodyRaw([]byte(s))
 	if strings.HasPrefix(s, "{") || strings.HasPrefix(s, "[") {
 		r.ContentType(ContentTypeJson)
-	} else if strings.Contains(s, "=") || strings.Contains(s, "%") {
-		r.ContentType(ContentTypeForm)
 	} else if strings.HasPrefix(s, "<") {
 		r.ContentType(ContentTypeXml)
+	} else if strings.Contains(s, "=") || strings.Contains(s, "%") {
+		r.ContentType(ContentTypeForm)
 	} else {
 		r.ContentType(ContentTypeOctetStream)
 	}

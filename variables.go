@@ -11,7 +11,7 @@ const (
 	MethodPatch            = "PATCH"
 	ContentTypeJson        = "application/json"
 	ContentTypeForm        = "application/x-www-form-urlencoded"
-	ContentTypeXml         = "application/xml"
+	ContentTypeXml         = "text/xml"
 	ContentTypeText        = "text/plain"
 	ContentTypeOctetStream = "application/octet-stream"
 )
