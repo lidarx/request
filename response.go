@@ -94,7 +94,13 @@ func (r *Response) Cookie(k string) (string, bool) {
 	if v == nil {
 		return "", false
 	}
-	return string(v), true
+	c := fasthttp.AcquireCookie()
+	defer fasthttp.ReleaseCookie(c)
+	err := c.ParseBytes(v)
+	if err != nil {
+		return "", false
+	}
+	return string(c.Value()), true
 }
 
 func (r *Response) String() string {

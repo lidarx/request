@@ -198,7 +198,7 @@ func (r *Request) BasicAuth(u, p string) *Request {
 }
 
 func (r *Request) ClearTrace() *Request {
-	r.Trace = &[]TraceInfo{}
+	*r.Trace = []TraceInfo{}
 	return r
 }
 
@@ -209,8 +209,8 @@ func (r *Request) SetHeader(h Header) *Request {
 	return r
 }
 
-func (r *Request) WithTrace() *Request {
-	r.Trace = &[]TraceInfo{}
+func (r *Request) WithTrace(t *[]TraceInfo) *Request {
+	r.Trace = t
 	return r
 }
 
@@ -224,7 +224,6 @@ func (r *Request) Client(c *fasthttp.Client) *Request {
 func (r *Request) MultipartFiles(fs Files) *Request {
 	var b bytes.Buffer
 	w := multipart.NewWriter(&b)
-	defer w.Close()
 
 	for n, f := range fs {
 		h := make(textproto.MIMEHeader)
@@ -235,7 +234,6 @@ func (r *Request) MultipartFiles(fs Files) *Request {
 			h.Set("Content-Disposition",
 				fmt.Sprintf(`form-data; name="%s"; filename="%s"`,
 					escapeQuotes(n), escapeQuotes(f.FileName)))
-			h.Set("Content-Type", "application/octet-stream")
 		} else {
 			h.Set("Content-Disposition",
 				fmt.Sprintf(`form-data; name="%s"`, escapeQuotes(n)))
@@ -250,6 +248,7 @@ func (r *Request) MultipartFiles(fs Files) *Request {
 			_, _ = io.Copy(part, reader)
 		}
 	}
+	w.Close()
 
 	r.Request.SetBodyRaw(b.Bytes())
 	r.Request.Header.SetMultipartFormBoundary(w.Boundary())
