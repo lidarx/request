@@ -108,15 +108,18 @@ func (r *Response) String() string {
 }
 
 func (r *Response) Search(reg *regexp.Regexp) map[string]string {
-	match := reg.FindStringSubmatch(r.Text())
+	match := reg.FindAllStringSubmatch(r.Text(), -1)
 	groupNames := reg.SubexpNames()
 	result := make(map[string]string)
+	if len(match) == 0 {
+		return result
+	}
 	if len(match) < len(groupNames) {
 		return result
 	}
 	for i, name := range groupNames {
 		if i != 0 && name != "" {
-			result[name] = match[i]
+			result[name] = match[0][i]
 		}
 	}
 	return result
