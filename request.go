@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/lidarx/tls"
 	"github.com/valyala/fasthttp"
+	"github.com/valyala/fasthttp/fasthttpproxy"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -30,7 +31,7 @@ type File struct {
 	Content     []byte
 }
 
-var defaultClient = fasthttp.Client{
+var defaultClient = &fasthttp.Client{
 	TLSConfig:                 &tls.Config{InsecureSkipVerify: true, MinVersion: tls.VersionSSL30},
 	MaxIdleConnDuration:       5 * time.Second,
 	ReadTimeout:               5 * time.Second,
@@ -54,7 +55,7 @@ func AcquireRequest() *Request {
 		return &Request{
 			Request: fasthttp.AcquireRequest(),
 			Jar:     jar,
-			client:  &defaultClient,
+			client:  defaultClient,
 		}
 	}
 	r := v.(*Request)
@@ -65,6 +66,15 @@ func AcquireRequest() *Request {
 
 func AcquireRequestResponse() (*Request, *Response) {
 	return AcquireRequest(), AcquireResponse()
+}
+
+func ReplaceGlobalClient(c *fasthttp.Client) {
+	defaultClient = c
+}
+
+func ReplaceGlobalProxy(proxy string) {
+	defaultClient.Dial = fasthttpproxy.FasthttpSocksDialer(proxy)
+	return
 }
 
 func ReleaseRequestResponse(req *Request, resp *Response) {
