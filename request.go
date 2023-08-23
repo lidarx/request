@@ -72,8 +72,13 @@ func ReplaceGlobalClient(c *fasthttp.Client) {
 	defaultClient = c
 }
 
-func ReplaceGlobalProxy(proxy string) {
+func SetSocks5Proxy(proxy string) {
 	defaultClient.Dial = fasthttpproxy.FasthttpSocksDialer(proxy)
+	return
+}
+
+func SetHTTPProxy(proxy string) {
+	defaultClient.Dial = fasthttpproxy.FasthttpHTTPDialer(proxy)
 	return
 }
 
