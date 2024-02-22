@@ -184,7 +184,7 @@ func (r *Request) BodyRaw(s string) *Request {
 		r.ContentType(ContentTypeXml)
 	} else if strings.Contains(s, "=") || strings.Contains(s, "%") {
 		r.ContentType(ContentTypeForm)
-	} else {
+	} else if len(s) > 0 {
 		r.ContentType(ContentTypeOctetStream)
 	}
 	return r
