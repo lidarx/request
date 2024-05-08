@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"github.com/lidarx/tls"
 	"github.com/valyala/fasthttp"
@@ -106,6 +107,7 @@ type Request struct {
 	*fasthttp.Request
 	Trace        *[]TraceInfo
 	maxRedirects int
+	maxRetry     int
 	Jar          *cookiejar.Jar
 	client       *fasthttp.Client
 }
@@ -120,6 +122,11 @@ func (r *Request) Reset() {
 
 func (r *Request) SetMaxRedirects(t int) *Request {
 	r.maxRedirects = t
+	return r
+}
+
+func (r *Request) SetRetry(t int) *Request {
+	r.maxRetry = t
 	return r
 }
 
@@ -309,11 +316,19 @@ func (r *Request) Do(resp *Response) error {
 			})
 		}
 	}()
-	if r.maxRedirects > 1 {
-		return r.client.DoRedirects(r.Request, resp.Response, r.maxRedirects)
-	} else {
-		return r.client.Do(r.Request, resp.Response)
+	for i := 0; i <= r.maxRetry; i++ {
+		if r.maxRedirects > 1 {
+			err = r.client.DoRedirects(r.Request, resp.Response, r.maxRedirects)
+		} else {
+			err = r.client.Do(r.Request, resp.Response)
+		}
+		if err == nil {
+			return nil
+		} else if !errors.Is(err, fasthttp.ErrTimeout) {
+			return err
+		}
 	}
+	return err
 }
 
 func (r *Request) ResetBody() *Request {
