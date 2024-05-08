@@ -115,6 +115,7 @@ type Request struct {
 func (r *Request) Reset() {
 	r.Trace = nil
 	r.maxRedirects = 0
+	r.maxRetry = 0
 	r.Jar = nil
 	fasthttp.ReleaseRequest(r.Request)
 	r.Request = nil
