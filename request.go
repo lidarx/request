@@ -206,6 +206,19 @@ func (r *Request) Host(host string) *Request {
 	if host != "" {
 		r.Request.UseHostHeader = true
 		r.Request.Header.SetHostBytes([]byte(host))
+		if bytes.Equal(r.Request.URI().Scheme(), []byte("https")) {
+			r.client = &fasthttp.Client{
+				TLSConfig:                 &tls.Config{InsecureSkipVerify: true, MinVersion: tls.VersionSSL30, ServerName: host},
+				MaxIdleConnDuration:       5 * time.Second,
+				ReadTimeout:               5 * time.Second,
+				WriteTimeout:              5 * time.Second,
+				MaxResponseBodySize:       10 * 1024 * 1024,
+				MaxIdemponentCallAttempts: 1,
+				RetryIf: func(request *fasthttp.Request) bool {
+					return false
+				},
+			}
+		}
 	}
 	return r
 }
