@@ -121,6 +121,16 @@ func (r *Request) Reset() {
 	r.Request = nil
 }
 
+func (r *Request) SetSocks5Proxy(proxy string) *Request {
+	r.client.Dial = fasthttpproxy.FasthttpSocksDialer(proxy)
+	return r
+}
+
+func (r *Request) SetHTTPProxy(proxy string) *Request {
+	r.client.Dial = fasthttpproxy.FasthttpHTTPDialer(proxy)
+	return r
+}
+
 func (r *Request) SetMaxRedirects(t int) *Request {
 	r.maxRedirects = t
 	return r
