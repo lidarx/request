@@ -108,6 +108,7 @@ type Request struct {
 	Trace        *[]TraceInfo
 	maxRedirects int
 	maxRetry     int
+	retryClient  *fasthttp.Client
 	Jar          *cookiejar.Jar
 	client       *fasthttp.Client
 }
@@ -119,6 +120,7 @@ func (r *Request) Reset() {
 	r.Jar = nil
 	fasthttp.ReleaseRequest(r.Request)
 	r.Request = nil
+	r.retryClient = nil
 }
 
 func (r *Request) SetSocks5Proxy(proxy string) *Request {
@@ -138,6 +140,26 @@ func (r *Request) SetMaxRedirects(t int) *Request {
 
 func (r *Request) SetRetry(t int) *Request {
 	r.maxRetry = t
+	r.retryClient = &fasthttp.Client{
+		TLSConfig:           r.client.TLSConfig,
+		MaxIdleConnDuration: r.client.MaxIdleConnDuration,
+		ReadTimeout:         r.client.ReadTimeout,
+		WriteTimeout:        r.client.WriteTimeout,
+		MaxResponseBodySize: r.client.MaxResponseBodySize,
+		RetryIf: func(request *fasthttp.Request) bool {
+			return false
+		},
+	}
+	return r
+}
+
+func (r *Request) SetRetrySocks5Proxy(proxy string) *Request {
+	r.retryClient.Dial = fasthttpproxy.FasthttpSocksDialer(proxy)
+	return r
+}
+
+func (r *Request) SetRetryHTTP5Proxy(proxy string) *Request {
+	r.retryClient.Dial = fasthttpproxy.FasthttpHTTPDialer(proxy)
 	return r
 }
 
