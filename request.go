@@ -374,7 +374,7 @@ func (r *Request) Do(resp *Response) error {
 		}
 		if err == nil {
 			return nil
-		} else if !errors.Is(err, fasthttp.ErrTimeout) {
+		} else if !errors.Is(err, fasthttp.ErrTimeout) && !errors.Is(err, fasthttp.ErrConnectionClosed) {
 			return err
 		}
 	}
