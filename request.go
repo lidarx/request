@@ -362,11 +362,15 @@ func (r *Request) Do(resp *Response) error {
 			})
 		}
 	}()
+	client := r.client
 	for i := 0; i <= r.maxRetry; i++ {
+		if i != 0 {
+			client = r.retryClient
+		}
 		if r.maxRedirects > 1 {
-			err = r.client.DoRedirects(r.Request, resp.Response, r.maxRedirects)
+			err = client.DoRedirects(r.Request, resp.Response, r.maxRedirects)
 		} else {
-			err = r.client.Do(r.Request, resp.Response)
+			err = client.Do(r.Request, resp.Response)
 		}
 		if err == nil {
 			return nil
