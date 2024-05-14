@@ -3,10 +3,10 @@ package request
 import (
 	"bufio"
 	"bytes"
+	"crypto/tls"
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"github.com/lidarx/tls"
 	"github.com/valyala/fasthttp"
 	"github.com/valyala/fasthttp/fasthttpproxy"
 	"io"
