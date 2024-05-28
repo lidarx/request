@@ -56,7 +56,16 @@ func AcquireRequest() *Request {
 		return &Request{
 			Request: fasthttp.AcquireRequest(),
 			Jar:     jar,
-			client:  defaultClient,
+			client: &fasthttp.Client{
+				TLSConfig:                 &tls.Config{InsecureSkipVerify: true, MinVersion: tls.VersionSSL30},
+				MaxIdleConnDuration:       defaultClient.MaxIdleConnDuration,
+				ReadTimeout:               defaultClient.ReadTimeout,
+				WriteTimeout:              defaultClient.WriteTimeout,
+				MaxResponseBodySize:       defaultClient.MaxResponseBodySize,
+				MaxIdemponentCallAttempts: defaultClient.MaxIdemponentCallAttempts,
+				RetryIf:                   defaultClient.RetryIf,
+				Dial:                      defaultClient.Dial,
+			},
 		}
 	}
 	r := v.(*Request)
@@ -79,6 +88,9 @@ func SetSocks5Proxy(proxy string) {
 }
 
 func SetHTTPProxy(proxy string) {
+	if strings.HasPrefix(proxy, "http://") {
+		proxy = strings.TrimPrefix(proxy, "http://")
+	}
 	defaultClient.Dial = fasthttpproxy.FasthttpHTTPDialer(proxy)
 	return
 }
@@ -244,17 +256,7 @@ func (r *Request) Host(host string) *Request {
 		if bytes.Equal(r.Request.URI().Scheme(), []byte("https")) {
 			// servername 不能包含端口
 			servername := strings.Split(host, ":")[0]
-			r.client = &fasthttp.Client{
-				TLSConfig:                 &tls.Config{InsecureSkipVerify: true, MinVersion: tls.VersionSSL30, ServerName: servername},
-				MaxIdleConnDuration:       5 * time.Second,
-				ReadTimeout:               5 * time.Second,
-				WriteTimeout:              5 * time.Second,
-				MaxResponseBodySize:       10 * 1024 * 1024,
-				MaxIdemponentCallAttempts: 1,
-				RetryIf: func(request *fasthttp.Request) bool {
-					return false
-				},
-			}
+			r.client.TLSConfig.ServerName = servername
 		}
 	}
 	return r
