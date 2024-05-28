@@ -242,8 +242,10 @@ func (r *Request) Host(host string) *Request {
 		r.Request.UseHostHeader = true
 		r.Request.Header.SetHostBytes([]byte(host))
 		if bytes.Equal(r.Request.URI().Scheme(), []byte("https")) {
+			// servername 不能包含端口
+			servername := strings.Split(host, ":")[0]
 			r.client = &fasthttp.Client{
-				TLSConfig:                 &tls.Config{InsecureSkipVerify: true, MinVersion: tls.VersionSSL30, ServerName: host},
+				TLSConfig:                 &tls.Config{InsecureSkipVerify: true, MinVersion: tls.VersionSSL30, ServerName: servername},
 				MaxIdleConnDuration:       5 * time.Second,
 				ReadTimeout:               5 * time.Second,
 				WriteTimeout:              5 * time.Second,
