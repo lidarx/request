@@ -129,6 +129,9 @@ func (r *Request) SetSocks5Proxy(proxy string) *Request {
 }
 
 func (r *Request) SetHTTPProxy(proxy string) *Request {
+	if strings.HasPrefix(proxy, "http://") {
+		proxy = strings.TrimPrefix(proxy, "http://")
+	}
 	r.client.Dial = fasthttpproxy.FasthttpHTTPDialer(proxy)
 	return r
 }
