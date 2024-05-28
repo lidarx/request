@@ -335,7 +335,6 @@ var quoteEscaper = strings.NewReplacer("\\", "\\\\", `"`, "\\\"")
 func escapeQuotes(s string) string {
 	return quoteEscaper.Replace(s)
 }
-
 func (r *Request) Do(resp *Response) error {
 	if len(r.Header.UserAgent()) == 0 {
 		// default useragent
@@ -383,7 +382,8 @@ func (r *Request) Do(resp *Response) error {
 		} else {
 			err = client.Do(r.Request, resp.Response)
 		}
-		if err == nil {
+		// 忽略user canceled错误
+		if err == nil || strings.Contains(err.Error(), "user canceled") {
 			return nil
 		} else if !errors.Is(err, fasthttp.ErrTimeout) && !errors.Is(err, fasthttp.ErrConnectionClosed) {
 			return err
