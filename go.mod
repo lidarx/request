@@ -3,7 +3,7 @@ module github.com/lidarx/request
 go 1.20
 
 require (
-	github.com/valyala/fasthttp v1.52.0
+	github.com/valyala/fasthttp v1.54.0
 	golang.org/x/text v0.15.0
 )
 

@@ -34,7 +34,7 @@ type File struct {
 
 var defaultClient = &fasthttp.Client{
 	TLSConfig:                 &tls.Config{InsecureSkipVerify: true, MinVersion: tls.VersionSSL30},
-	MaxIdleConnDuration:       5 * time.Second,
+	MaxIdleConnDuration:       1 * time.Second, //减少等待时间
 	ReadTimeout:               5 * time.Second,
 	WriteTimeout:              5 * time.Second,
 	MaxResponseBodySize:       10 * 1024 * 1024,
