@@ -212,6 +212,8 @@ func (r *Request) SetParams(p Params) *Request {
 
 func (r *Request) SetTimeout(t time.Duration) *Request {
 	r.Request.SetTimeout(t)
+	r.client.ReadTimeout = t
+	r.client.WriteTimeout = t
 	return r
 }
 
