@@ -59,14 +59,16 @@ func AcquireRequest() *Request {
 			Request: fasthttp.AcquireRequest(),
 			Jar:     jar,
 			client: &fasthttp.Client{
-				TLSConfig:                 &tls.Config{InsecureSkipVerify: true, MinVersion: tls.VersionSSL30},
-				MaxIdleConnDuration:       defaultClient.MaxIdleConnDuration,
-				ReadTimeout:               defaultClient.ReadTimeout,
-				WriteTimeout:              defaultClient.WriteTimeout,
-				MaxResponseBodySize:       defaultClient.MaxResponseBodySize,
-				MaxIdemponentCallAttempts: defaultClient.MaxIdemponentCallAttempts,
-				RetryIf:                   defaultClient.RetryIf,
-				Dial:                      defaultClient.Dial,
+				TLSConfig:                     &tls.Config{InsecureSkipVerify: true, MinVersion: tls.VersionSSL30},
+				MaxIdleConnDuration:           defaultClient.MaxIdleConnDuration,
+				ReadTimeout:                   defaultClient.ReadTimeout,
+				WriteTimeout:                  defaultClient.WriteTimeout,
+				MaxResponseBodySize:           defaultClient.MaxResponseBodySize,
+				MaxIdemponentCallAttempts:     defaultClient.MaxIdemponentCallAttempts,
+				RetryIf:                       defaultClient.RetryIf,
+				Dial:                          defaultClient.Dial,
+				DisablePathNormalizing:        true,
+				DisableHeaderNamesNormalizing: true,
 			},
 		}
 	}
@@ -232,6 +234,8 @@ func (r *Request) SetData(p Data) *Request {
 func (r *Request) DisableNormalizing() *Request {
 	r.Request.Header.DisableNormalizing()
 	r.Request.URI().DisablePathNormalizing = true
+	r.client.DisablePathNormalizing = true
+	r.client.DisableHeaderNamesNormalizing = true
 	return r
 }
 
