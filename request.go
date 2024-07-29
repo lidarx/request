@@ -42,6 +42,8 @@ var defaultClient = &fasthttp.Client{
 	RetryIf: func(request *fasthttp.Request) bool {
 		return false
 	},
+	DisablePathNormalizing:        true,
+	DisableHeaderNamesNormalizing: true,
 }
 
 // AcquireRequest returns an empty Request instance from request pool.
