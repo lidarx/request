@@ -177,7 +177,10 @@ func (r *Request) SetRetrySocks5Proxy(proxy string) *Request {
 	return r
 }
 
-func (r *Request) SetRetryHTTP5Proxy(proxy string) *Request {
+func (r *Request) SetRetryHTTPProxy(proxy string) *Request {
+	if strings.HasPrefix(proxy, "http://") {
+		proxy = strings.TrimPrefix(proxy, "http://")
+	}
 	r.retryClient.Dial = fasthttpproxy.FasthttpHTTPDialer(proxy)
 	return r
 }
